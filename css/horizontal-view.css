@@ -1,0 +1,9 @@
+/* The heart of the matter */
+.testimonial-group > .row {
+    overflow-x: auto;
+}
+.testimonial-group > .row > .col-sm {
+    display: inline-block;
+    float: none;
+    word-break: keep-all;
+}

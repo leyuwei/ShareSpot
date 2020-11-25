@@ -1,0 +1,155 @@
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>ShareSpot</title>
+    <link rel="shortcut icon" href="img/logo-min.png">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/buttons.css">
+    <link rel="stylesheet" href="css/bootstrap-datepicker.standalone.css">
+
+    <script src="js/jq-3.5.1.js"> </script>
+    <script src="js/bootstrap.min.js"> </script>
+    <script src="js/popper.js"> </script>
+    <script src="js/bootstrap-datepicker.js"> </script>
+    <script src="js/cryptojs.min.js"></script>
+    <script src="js/cipher-core.min.js"></script>
+    <script src="js/core.min.js"></script>
+    <script src="js/hmac.min.js"></script>
+    <script src="js/sha1.min.js"></script>
+    <script src="js/wutong-api.js"></script>
+
+</head>
+
+<body>
+
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">
+        <img src="img/logo-min.png" width="30" height="30" class="d-inline-block align-top" alt="" loading="lazy"/>
+        ShareSpot
+    </a>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Login <span class="sr-only">Login</span></a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="modal fade" id="uploadModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">ShareSpot Tips</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="taginfo">
+                test
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="alert alert-info" role="alert">
+            If you do not have a ShareSpot account, the login process will help you create one.
+        </div>
+        <form>
+            <div class="form-group">
+                <label for="inputSecret">Brain Codes</label>
+                <input type="text" class="form-control" id="inputSecret" aria-describedby="secretHelp">
+                <small id="secretHelp" class="form-text text-muted">We'll never share your codes with anyone else.</small>
+            </div>
+            <div class="form-group">
+                <label for="inputPwd">Password</label>
+                <input type="password" class="form-control" id="inputPwd">
+            </div>
+            <div class="form-group">
+                <label for="inputType">User Type</label>
+                <select id="inputType" class="form-control">
+                    <option selected>Hotspot</option>
+                    <option>Consumer</option>
+                </select>
+            </div>
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="inputChk">
+                <label class="form-check-label" for="inputChk">I agree with all terms of the <a href='#'>ShareSpot service</a></label>
+            </div>
+        </form>
+        <button id="btnLogin" name="btnLogin" type="submit" class="btn btn-primary">Login to ShareSpot</button>
+    </div>
+</div>
+
+<nav class="navbar fixed-bottom navbar-light bg-light">
+    2020·链谷杯参赛作品 © 郭瑞伟|乐煜炜|杨兹博|高征|王炎
+</nav>
+
+<script>
+
+    $('#btnLogin').click(function() {
+        var username = document.getElementById("inputSecret").value;
+        var password = document.getElementById("inputPwd").value;
+        if (username === "" || password === "") {
+            document.getElementById("taginfo").innerHTML = "Please fill in all the required fields!";
+            $('#uploadModal').modal({
+                keyboard: false
+            });
+            return;
+        }
+        if (!$('#inputChk').prop('checked')) {
+            document.getElementById("taginfo").innerHTML = "You must accept the service terms.";
+            $('#uploadModal').modal({
+                keyboard: false
+            });
+            return;
+        }
+
+        var pwdenc = CryptoJS.SHA1(password);
+        var address = username.toString();
+        var ts = Date.now();
+        var type = 0;
+        if (document.getElementById("inputType").value === "Consumer")
+            type = 1;
+        invoke_stamethod_smart_contract('wvm', contract_name, 'get_account', [address.toString()], null, function (data) {
+            if (data.data.result === "") {
+                // goto registration
+                var balance = 0;
+                if (type === 1)
+                    balance = 10000;  // Award user with initial balance equalling 10000
+                invoke_dynmethod_smart_contract('wvm', contract_name, 'set_account', [address.toString(), pwdenc.toString(), balance, type], null, function (data) {
+                    if (type === 1)
+                        location.href = "service_user.html?ts=" + ts + "&pwdenc=" + pwdenc.toString() + "&secrets=" + username + "&pwd=" + password;
+                    else
+                        location.href = "service_hotspot.html?ts=" + ts + "&pwdenc=" + pwdenc.toString() + "&secrets=" + username + "&pwd=" + password;
+                })
+            } else if (JSON.parse(data.data.result).password === pwdenc.toString()) {
+                if (JSON.parse(data.data.result).type === 1)
+                    location.href = "service_user.html?ts=" + ts + "&pwdenc=" + pwdenc.toString() + "&secrets=" + username + "&pwd=" + password;
+                else
+                    location.href = "service_hotspot.html?ts=" + ts + "&pwdenc=" + pwdenc.toString() + "&secrets=" + username + "&pwd=" + password;
+            } else {
+                $("#inputPwd").val("");
+                document.getElementById("taginfo").innerHTML = "Your password is incorrect.";
+                $('#uploadModal').modal({
+                    keyboard: false
+                });
+            }
+        })
+
+    });
+</script>
+
+</body>
+
+</html>

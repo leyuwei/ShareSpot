@@ -1,0 +1,353 @@
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>ShareSpot</title>
+    <link rel="shortcut icon" href="img/logo-min.png">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/buttons.css">
+    <link rel="stylesheet" href="css/bootstrap-datepicker.standalone.css">
+    <link rel="stylesheet" href="css/horizontal-view.css">
+
+    <script src="js/jq-3.5.1.js"> </script>
+    <script src="js/bootstrap.min.js"> </script>
+    <script src="js/popper.js"> </script>
+    <script src="js/bootstrap-datepicker.js"> </script>
+    <script src="js/cryptojs.min.js"> </script>
+    <script src="js/cipher-core.min.js"> </script>
+    <script src="js/core.min.js"> </script>
+    <script src="js/hmac.min.js"> </script>
+    <script src="js/sha1.min.js"> </script>
+    <script src="js/wutong-api.js"> </script>
+    <script src="js/cryptico.js"> </script>
+
+</head>
+
+<body>
+
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">
+        <img src="img/logo-min.png" width="30" height="30" class="d-inline-block align-top" alt="" loading="lazy"/>
+        ShareSpot
+    </a>
+
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">User Center <span class="sr-only">User Center</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="index.html">logout <span class="sr-only">logout</span></a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="modal fade" id="uploadModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">ShareSpot Tips</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="taginfo">
+                test
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="bgModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Charge Your Account</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="inputChargeAmount" class="col-form-label">Charge Amount:</label>
+                        <input type="number" class="form-control" id="inputChargeAmount">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="close_charge">Close</button>
+                <button type="button" id="bgbtn-bg" class="btn btn-primary" data-dismiss="modal">Charge</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="notloginwarning" class="alert alert-danger" role="alert">
+    You must login first > <a href="index.html">go to login page</a>
+</div>
+
+<div id="mainconsole">
+
+<div id="welcomebanner" class="alert alert-success" role="alert">
+    Good Morning, Admin.
+</div>
+
+<div id="ret_keys">
+
+</div>
+
+<script>
+    function fillform(hr_hotspotid, hr_category, hr_availtime, hr_price, hr_id) {
+        $("#hr_hotspotid").val(hr_hotspotid);
+        $("#hr_category").val(hr_category);
+        $("#hr_availtime").val(hr_availtime);
+        $("#hr_price").val(hr_price);
+        $("#hr_id").val(hr_id);
+    }
+</script>
+
+<div class="container-fluid testimonial-group">
+    <div class="row d-flex flex-nowrap" id="resource_pool">
+
+    </div>
+</div>
+
+
+<div class="card">
+    <div class="card-body">
+        <form>
+            <fieldset disabled>
+                <div class="form-group">
+                    <label for="hr_hotspotid">Hotspot Name</label>
+                    <input type="text" id="hr_hotspotid" class="form-control" placeholder="Please select a hotspot first">
+                </div>
+                <input type="hidden" id="hr_id" value="" name="hr_id">
+                <div class="form-group">
+                    <label for="hr_category">Resource Category</label>
+                    <input type="text" id="hr_category" class="form-control" placeholder="Please select a hotspot first">
+                </div>
+                <div class="form-group">
+                    <label for="hr_availtime">Maximum Allowed Request Time (seconds)</label>
+                    <input type="number" id="hr_availtime" class="form-control" placeholder="Please select a hotspot first">
+                </div>
+                <div class="form-group">
+                    <label for="hr_price">Price Per Second</label>
+                    <input type="number" id="hr_price" class="form-control" placeholder="Please select a hotspot first">
+                </div>
+            </fieldset>
+            <div class="form-group">
+                <label for="inputSvcTime">Request Service Time</label>
+                <input type="number" class="form-control" id="inputSvcTime">
+            </div>
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="inputChk">
+                <label class="form-check-label" for="inputChk">I accept that the deposits will not be returned after the purchase</label>
+            </div>
+        </form>
+        <div class="btn-group" role="group" aria-label="Basic example">
+            <button id="btnReq" name="btnReq" type="button" class="btn btn-primary">Request This Hotspot</button>
+            <button id="btnCharge" name="btnCharge" type="button" class="btn btn-outline-secondary">Charge My Account</button>
+        </div>
+    </div>
+</div>
+
+<nav class="navbar rounded-bottom navbar-light bg-light">
+    2020·链谷杯参赛作品 © 郭瑞伟|乐煜炜|杨兹博|高征|王炎
+</nav>
+
+</div>
+
+<!-- EXAMPLE of RSA enc/dec
+    <script>
+        var PassPhrase = "leyuwei";
+        var Bits = 1024;
+        var privkey = cryptico.generateRSAKey(PassPhrase, Bits);
+        var pubkey = cryptico.publicKeyString(privkey);
+        var enced = cryptico.encrypt("I Love You",pubkey);
+        var deced = cryptico.decrypt(enced.cipher,privkey);
+        alert(enced.cipher);
+        alert(deced.plaintext);
+    </script>
+-->
+
+<script>
+    var url_string = window.location.href;
+    var url = new URL(url_string);
+    var ts = url.searchParams.get("ts");
+    var secrets = url.searchParams.get("secrets");
+    var pwdenc = url.searchParams.get("pwdenc");
+    var pwd = url.searchParams.get("pwd");
+    var balance = -1;
+    var address = secrets.toString();
+
+    var Bits = 1024;
+    var privkey = cryptico.generateRSAKey(secrets+pwd, Bits);
+    var pubkey = cryptico.publicKeyString(privkey);
+
+    function get_adding_resource_part(hr_id, hr_name, hr_type, hr_maxallowed, hr_price) {
+        return "<div class='col-sm'>\n" +
+            "            <div class='card overflow-hidden' style='min-width: 18rem;'>\n" +
+            "                <div class='card-body'>\n" +
+            "                    <h5 class='card-title'>Hotspot " + hr_name + "</h5>\n" +
+            "                    <h6 class='card-subtitle mb-2 text-muted'>" + hr_type + "</h6>\n" +
+            "                    <p class='card-text'>max allowed: " + hr_maxallowed + " secs<br>price: " + hr_price + " / sec</p>\n" +
+            "                    <a href=\"javascript:fillform('" + hr_name + "','" + hr_type + "'," + hr_maxallowed + "," + hr_price + ",'" + hr_id + "')\" class='card-link'>Request</a>\n" +
+            "                </div>\n" +
+            "            </div>\n" +
+            "        </div>";
+    }
+
+    function get_all_hotspots() {
+        invoke_stamethod_smart_contract('wvm', contract_name, 'get_resource', [], null, function (data) {
+            if (data.data.result == null || data.data.result === [] || data.data.result === "{}") {
+                $("#resource_pool").html("<div class=\"alert alert-primary\" role=\"alert\">Sorry! No resource is currently available to users.</div>");
+                return;
+            }
+            $("#resource_pool").html("");
+            var dat = JSON.parse(data.data.result);
+            for(var key in dat){
+                var value = JSON.parse(dat[key]);
+                $("#resource_pool").append(get_adding_resource_part(key, value.ap_addr, value.type, value.max_allowed, value.price))
+            }
+        })
+    }
+
+    if (ts === null || secrets === null || pwdenc === null) {
+        $("#mainconsole").remove();
+    } else {
+        $("#notloginwarning").remove();
+        $("#welcomebanner").html("<b>" + secrets + "</b>, welcome! Your account balance is " + "<b>" + balance + "</b>.");
+        // verify user account
+        invoke_stamethod_smart_contract('wvm', contract_name, 'get_account', [address.toString()], null, function (data) {
+            try {
+                var d = JSON.parse(data.data.result);
+            } catch (e) {
+                //alert("There is an error in your account. This usually happens when your account has just been registered. Please refresh the current page.");
+                location.reload();
+            }
+            balance = d.balance;
+            if (pwdenc === d.password) {
+                $("#welcomebanner").html("<b>" + secrets + "</b>, welcome! Your account balance is " + "<b>" + balance + "</b>.");
+                get_all_hotspots();
+                setInterval(get_all_hotspots, 10000);
+            } else {
+                $("#mainconsole").remove();
+                alert("Illegal account access detected. Please login first!");
+            }
+            if (balance < 0) {
+                alert("Your account balance is insufficient. Please charge your account!");
+            }
+        })
+    }
+</script>
+
+<script>
+    $('#btnCharge').click(function(){
+        $('#bgModal').modal({
+            keyboard: false
+        });
+        return;
+    });
+    $('#bgbtn-bg').click(function(){
+        var charge_amount = document.getElementById("inputChargeAmount").value;
+        invoke_dynmethod_smart_contract('wvm', contract_name, 'set_account', [address.toString(), pwdenc.toString(), balance + parseInt(charge_amount), 1], null, function (data) {
+            alert("Your account has been successfully charged!");
+            location.reload();
+        })
+    });
+
+    function get_record_ue() {
+        invoke_stamethod_smart_contract('wvm', contract_name, 'get_record_ue', [], null, function (data) {
+            if (data.data.result == null || data.data.result === "" || data.data.result === "{}" || data.data.result === [])
+                return;
+            var dat = JSON.parse(data.data.result);
+            var keys = ""
+            var keys_header = "Your request(s) have been authorized by hotspot. Access keys are decrypted as follows.<br>";
+            for(var key in dat){
+                var value = JSON.parse(dat[key]);
+                if (value.ue_addr.toString() === secrets)
+                    keys = keys + "<b>[key]</b> " + cryptico.decrypt(value.txid_accesscode.toString(),privkey).plaintext + "<br>";
+            }
+            if (keys === "")
+                return;
+            keys = keys_header + keys;
+            $("#ret_keys").html("<div class=\"alert alert-warning\" role=\"alert\">" + keys  + "</div>");
+            invoke_stamethod_smart_contract('wvm', contract_name, 'get_account', [address.toString()], null, function (data) {
+                try {
+                    var d = JSON.parse(data.data.result);
+                } catch (e) {
+                    alert("There is an error in your account. This usually happens when your account has just been registered. Please refresh the current page.");
+                }
+                balance = d.balance;
+                $("#welcomebanner").html("<b>" + secrets + "</b>, welcome! Your account balance is " + "<b>" + balance + "</b>.");
+            })
+        })
+    }
+
+    get_record_ue();
+    setInterval(get_record_ue, 10000);
+
+</script>
+
+<div id="testarea"></div>
+
+<script>
+
+    $('#btnReq').click(function() {
+        var svctime = document.getElementById("inputSvcTime").value;
+        var hr_hotspotid = document.getElementById("hr_hotspotid").value;
+        var hr_category = document.getElementById("hr_category").value;
+        var hr_availtime = document.getElementById("hr_availtime").value;
+        var hr_price = document.getElementById("hr_price").value;
+        var hr_id = document.getElementById("hr_id").value;
+        if (hr_hotspotid === "" ||
+            hr_category === "" ||
+            hr_availtime === "" ||
+            hr_price === "" ||
+            hr_id === "") {
+            document.getElementById("taginfo").innerHTML = "Please select a request hotspot first!";
+            $('#uploadModal').modal({
+                keyboard: false
+            });
+            return;
+        }
+
+        if (svctime === "") {
+            document.getElementById("taginfo").innerHTML = "Please fill in all the required fields!";
+            $('#uploadModal').modal({
+                keyboard: false
+            });
+            return;
+        }
+
+        if (!$('#inputChk').prop('checked')) {
+            document.getElementById("taginfo").innerHTML = "You must accept the service terms.";
+            $('#uploadModal').modal({
+                keyboard: false
+            });
+            return;
+        }
+
+        invoke_dynmethod_smart_contract('wvm', contract_name, 'request_service', [hr_id.toString(), secrets.toString(), pubkey.toString(), parseInt(svctime)], null, function (data) {
+            document.getElementById("taginfo").innerHTML = "Your request has been successfully made to hotspot!";
+            $('#uploadModal').modal({
+                keyboard: false
+            });
+            return;
+        })
+
+    });
+</script>
+
+</body>
+
+</html>
