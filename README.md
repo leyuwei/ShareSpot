@@ -1,7 +1,7 @@
 # ShareSpot 
 A WutongChain-based Wi-Fi Sharing Platform.
 
-![logo](img\logo.png)
+![logo](img/logo.png)
 
 ![title](title.png)
 
