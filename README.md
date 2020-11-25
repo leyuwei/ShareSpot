@@ -1,5 +1,5 @@
 # ShareSpot 
-A WutongChain-based Wi-Fi Sharing Platform.
+A Blockchain-based Wi-Fi Sharing Platform.
 
 ![logo](img/logo.png)
 
